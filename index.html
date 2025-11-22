@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Toyota Payment Worksheet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    /* MAIN INTERACTIVE PAGE (SCREEN) */
+    .page {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 24px 24px 32px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #eb0a1e;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    .header-left h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .header-left span {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+    .toyota-badge {
+      border-radius: 999px;
+      padding: 6px 14px;
+      border: 2px solid #eb0a1e;
+      color: #eb0a1e;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 2fr 2fr 1.5fr;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 0.85rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: #eb0a1e;
+      box-shadow: 0 0 0 1px #eb0a1e20;
+    }
+
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 12px 0 18px;
+      font-size: 0.9rem;
+    }
+    .summary-card {
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+    .summary-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+    .summary-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1.4fr 1.2fr;
+      gap: 16px;
+      margin-top: 4px;
+    }
+    .card {
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      background: #f9fafb;
+      font-size: 0.85rem;
+    }
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #111827;
+    }
+    .row {
+      margin-bottom: 6px;
+    }
+    .inline-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+    .inline-row input[type="checkbox"] {
+      width: auto;
+    }
+
+    .payments {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .payment-card {
+      border-radius: 12px;
+      border: 1px solid #fee2e2;
+      background: #fef2f2;
+      padding: 12px 14px;
+    }
+    .payment-card h3 {
+      margin: 0 0 4px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .big-number {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #b91c1c;
+      margin-bottom: 4px;
+    }
+    .muted {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    .signature-row {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      font-size: 0.8rem;
+    }
+    .sig-box {
+      border-top: 1px solid #9ca3af;
+      padding-top: 4px;
+    }
+
+    .actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+    button {
+      padding: 7px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #eb0a1e;
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #b91c1c;
+    }
+
+    /* ---------- BACKEND PRINT SHEET (PDF) ---------- */
+    #printSheet {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 24px 24px 32px;
+      display: none; /* hidden on screen */
+      font-size: 0.85rem;
+    }
+    #printSheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #eb0a1e;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    #printSheet-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    #printSheet-header span {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+    .ps-badge {
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 2px solid #eb0a1e;
+      color: #eb0a1e;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    #printSheet table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+    }
+    #printSheet th,
+    #printSheet td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    #printSheet .section-title {
+      font-weight: 700;
+      padding-top: 10px;
+      padding-bottom: 4px;
+    }
+
+    /* PRINT RULES */
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .page {
+        display: none;            /* hide interactive worksheet */
+      }
+      #printSheet {
+        display: block;           /* show dealer copy only */
+      }
+      .actions button {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MAIN WORKSHEET (SCREEN) -->
+  <div class="page">
+    <div class="header">
+      <div class="header-left">
+        <h1>Payment Options Worksheet</h1>
+        <span>Toyota – Sales Quote (Estimate Only)</span>
+      </div>
+      <div class="toyota-badge">Toyota</div>
+    </div>
+
+    <!-- TOP INFO -->
+    <div class="top-grid">
+      <div>
+        <label for="customerName">Customer Name</label>
+        <input type="text" id="customerName" placeholder="Customer full name" />
+      </div>
+      <div>
+        <label for="vehicleInfo">Vehicle (Year / Model / Trim)</label>
+        <input type="text" id="vehicleInfo" placeholder="2024 Toyota RAV4 XLE" />
+      </div>
+      <div>
+        <label for="date">Date</label>
+        <input type="text" id="date" />
+      </div>
+      <div>
+        <label for="vin">VIN</label>
+        <input type="text" id="vin" placeholder="Last 8 if you want" />
+      </div>
+      <div>
+        <label for="stock">Stock #</label>
+        <input type="text" id="stock" />
+      </div>
+      <div>
+        <label for="salesperson">Salesperson</label>
+        <input type="text" id="salesperson" placeholder="Taj" />
+      </div>
+    </div>
+
+    <!-- PRICE SUMMARY -->
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="summary-label">Vehicle Price</div>
+        <div class="summary-value" id="summaryPrice">$0.00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Total Due At Signing</div>
+        <div class="summary-value" id="summaryDue">$0.00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Total Savings / Equity</div>
+        <div class="summary-value" id="summaryEquity">$0.00</div>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="grid">
+      <!-- VEHICLE & TAXES -->
+      <div class="card">
+        <h2>Vehicle & Taxes</h2>
+        <div class="row">
+          <label for="price">Selling Price ($)</label>
+          <input type="number" id="price" value="35000" min="0" step="100" />
+        </div>
+        <div class="row">
+          <label for="fees">Doc / DMV / Other Fees ($)</label>
+          <input type="number" id="fees" value="500" min="0" step="10" />
+        </div>
+        <div class="row">
+          <label for="taxRate">Sales Tax Rate (%)</label>
+          <input type="number" id="taxRate" value="8.875" step="0.01" />
+        </div>
+        <div class="inline-row">
+          <input type="checkbox" id="taxExempt" />
+          <label for="taxExempt">Tax Exempt / Out of State</label>
+        </div>
+        <div class="row">
+          <label for="rebates">Rebates / Incentives ($)</label>
+          <input type="number" id="rebates" value="0" min="0" step="50" />
+        </div>
+      </div>
+
+      <!-- CASH & TRADE -->
+      <div class="card">
+        <h2>Cash & Trade</h2>
+        <div class="row">
+          <label for="downPayment">Customer Cash Down ($)</label>
+          <input type="number" id="downPayment" value="2000" min="0" step="100" />
+        </div>
+        <div class="row">
+          <label for="tradeValue">Trade Allowance ($)</label>
+          <input type="number" id="tradeValue" value="0" min="0" step="100" />
+        </div>
+        <div class="row">
+          <label for="tradePayoff">Trade Payoff ($)</label>
+          <input type="number" id="tradePayoff" value="0" min="0" step="100" />
+        </div>
+        <div class="row">
+          <label>Net Trade Equity (auto)</label>
+          <input type="number" id="tradeEquity" value="0" disabled />
+        </div>
+      </div>
+
+      <!-- FINANCE & LEASE TERMS (ON SCREEN ONLY) -->
+      <div class="card">
+        <h2>Finance & Lease Terms</h2>
+        <div class="row">
+          <label for="financeTerm">Finance Term (months)</label>
+          <input type="number" id="financeTerm" value="72" min="12" step="12" />
+        </div>
+        <div class="row">
+          <label for="financeAPR">Finance APR (%)</label>
+          <input type="number" id="financeAPR" value="5.9" step="0.01" />
+        </div>
+        <hr style="border:none;border-top:1px dashed #e5e7eb;margin:6px 0;">
+        <div class="row">
+          <label for="leaseTerm">Lease Term (months)</label>
+          <input type="number" id="leaseTerm" value="36" min="12" step="12" />
+        </div>
+        <div class="row">
+          <label for="residualPercent">Residual (% of price)</label>
+          <input type="number" id="residualPercent" value="60" step="0.1" />
+        </div>
+        <div class="row">
+          <label for="moneyFactor">Money Factor</label>
+          <input type="number" id="moneyFactor" value="0.00125" step="0.00001" />
+        </div>
+        <div class="row">
+          <label for="acqFee">Acquisition Fee ($)</label>
+          <input type="number" id="acqFee" value="895" min="0" step="25" />
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="payments">
+      <div class="payment-card">
+        <h3>Finance Payment</h3>
+        <div class="big-number" id="financePayment">$0.00 /mo</div>
+        <div class="muted" id="financeDetails"></div>
+      </div>
+      <div class="payment-card">
+        <h3>Lease Payment</h3>
+        <div class="big-number" id="leasePayment">$0.00 /mo</div>
+        <div class="muted" id="leaseDetails"></div>
+      </div>
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="signature-row">
+      <div class="sig-box">Customer Signature</div>
+      <div class="sig-box">Manager / Salesperson</div>
+    </div>
+
+    <div class="actions">
+      <button onclick="calculate()">Update Payments</button>
+      <button onclick="handlePrint()">Print Worksheet</button>
+      <span>* All figures are estimates only – final terms subject to lender approval.</span>
+    </div>
+  </div>
+
+  <!-- DEALER COPY – PRINT ONLY -->
+  <div id="printSheet">
+    <div id="printSheet-header">
+      <div>
+        <h2>Toyota Payment Summary</h2>
+        <span>Dealer Copy – Internal Use Only</span>
+      </div>
+      <div class="ps-badge">Toyota</div>
+    </div>
+
+    <div class="section-title">Customer / Vehicle</div>
+    <table>
+      <tr><th>Customer</th><td id="psCustomerName"></td></tr>
+      <tr><th>Vehicle</th><td id="psVehicleInfo"></td></tr>
+      <tr><th>VIN</th><td id="psVin"></td></tr>
+      <tr><th>Stock #</th><td id="psStock"></td></tr>
+      <tr><th>Salesperson</th><td id="psSalesperson"></td></tr>
+      <tr><th>Date</th><td id="psDate"></td></tr>
+    </table>
+
+    <div class="section-title">Front End</div>
+    <table>
+      <tr><th>Selling Price</th><td id="psSellingPrice"></td></tr>
+      <tr><th>Doc / DMV / Other Fees</th><td id="psFees"></td></tr>
+      <tr><th>Sales Tax Rate</th><td id="psTaxRate"></td></tr>
+    </table>
+
+    <div class="section-title">Payments</div>
+    <table>
+      <tr><th>Finance Payment</th><td id="psFinancePayment"></td></tr>
+      <tr><th>Lease Payment</th><td id="psLeasePayment"></td></tr>
+    </table>
+  </div>
+
+  <script>
+    function formatMoney(v) {
+      if (isNaN(v)) return "$0.00";
+      return "$" + v.toFixed(2);
+    }
+
+    function calculate() {
+      const price = parseFloat(document.getElementById("price").value) || 0;
+      const fees = parseFloat(document.getElementById("fees").value) || 0;
+      const taxRate = parseFloat(document.getElementById("taxRate").value) || 0;
+      const taxExempt = document.getElementById("taxExempt").checked;
+      const rebates = parseFloat(document.getElementById("rebates").value) || 0;
+
+      const downPayment = parseFloat(document.getElementById("downPayment").value) || 0;
+      const tradeValue = parseFloat(document.getElementById("tradeValue").value) || 0;
+      const tradePayoff = parseFloat(document.getElementById("tradePayoff").value) || 0;
+
+      const financeTerm = parseInt(document.getElementById("financeTerm").value) || 0;
+      const financeAPR = parseFloat(document.getElementById("financeAPR").value) || 0;
+
+      const leaseTerm = parseInt(document.getElementById("leaseTerm").value) || 0;
+      const residualPercent = parseFloat(document.getElementById("residualPercent").value) || 0;
+      const moneyFactor = parseFloat(document.getElementById("moneyFactor").value) || 0;
+      const acqFee = parseFloat(document.getElementById("acqFee").value) || 0;
+
+      // trade equity
+      const tradeEquity = tradeValue - tradePayoff;
+      document.getElementById("tradeEquity").value = tradeEquity.toFixed(2);
+
+      // gross price (with acq fee included – needed for lease)
+      const grossPrice = price + fees + acqFee - rebates;
+
+      // tax
+      let taxAmount = 0;
+      if (!taxExempt) {
+        taxAmount = grossPrice * (taxRate / 100);
+      }
+
+      // total due
+      const totalWithTax = grossPrice + taxAmount;
+
+      // credits
+      const totalCredits = downPayment + tradeEquity;
+
+      // finance amount (no acq fee in finance)
+      const financeAmount = totalWithTax - totalCredits - acqFee;
+
+      let financePayment = 0;
+      if (financeTerm > 0 && financeAmount > 0) {
+        const mRate = financeAPR / 100 / 12;
+        if (mRate === 0) {
+          financePayment = financeAmount / financeTerm;
+        } else {
+          financePayment =
+            financeAmount * (mRate / (1 - Math.pow(1 + mRate, -financeTerm)));
+        }
+      }
+
+      // lease calc
+      const capCost = price + fees + acqFee - downPayment - tradeEquity - rebates;
+      const residualValue = price * (residualPercent / 100);
+      let leaseBase = 0;
+      let leaseTaxMonthly = 0;
+      let leasePayment = 0;
+
+      if (leaseTerm > 0) {
+        const depreciation = (capCost - residualValue) / leaseTerm;
+        const rent = (capCost + residualValue) * moneyFactor;
+        leaseBase = depreciation + rent;
+        if (!taxExempt) {
+          leaseTaxMonthly = leaseBase * (taxRate / 100);
+        }
+        leasePayment = leaseBase + leaseTaxMonthly;
+      }
+
+      // top summary
+      document.getElementById("summaryPrice").textContent = formatMoney(price);
+      document.getElementById("summaryDue").textContent = formatMoney(
+        Math.max(totalWithTax - financeAmount, 0)
+      );
+      document.getElementById("summaryEquity").textContent = formatMoney(tradeEquity);
+
+      // payment cards on screen
+      document.getElementById("financePayment").textContent =
+        formatMoney(financePayment) + " /mo";
+
+      document.getElementById("financeDetails").textContent =
+        "Amount financed: " +
+        formatMoney(financeAmount) +
+        " • " +
+        financeTerm +
+        " months @ " +
+        financeAPR.toFixed(2) +
+        "% APR";
+
+      document.getElementById("leasePayment").textContent =
+        formatMoney(leasePayment) + " /mo";
+
+      document.getElementById("leaseDetails").textContent =
+        "Cap cost: " +
+        formatMoney(capCost) +
+        " • Residual: " +
+        formatMoney(residualValue) +
+        " (" +
+        residualPercent.toFixed(1) +
+        "%) • " +
+        leaseTerm +
+        " months";
+    }
+
+    // Fills dealer copy & prints (NO APR / MONEY FACTOR shown)
+    function handlePrint() {
+      // make sure numbers are up to date
+      calculate();
+
+      // customer / vehicle info
+      document.getElementById("psCustomerName").textContent =
+        document.getElementById("customerName").value;
+      document.getElementById("psVehicleInfo").textContent =
+        document.getElementById("vehicleInfo").value;
+      document.getElementById("psVin").textContent =
+        document.getElementById("vin").value;
+      document.getElementById("psStock").textContent =
+        document.getElementById("stock").value;
+      document.getElementById("psSalesperson").textContent =
+        document.getElementById("salesperson").value;
+      document.getElementById("psDate").textContent =
+        document.getElementById("date").value;
+
+      // front-end numbers
+      const price = parseFloat(document.getElementById("price").value) || 0;
+      const fees = parseFloat(document.getElementById("fees").value) || 0;
+      const taxRate = parseFloat(document.getElementById("taxRate").value) || 0;
+
+      document.getElementById("psSellingPrice").textContent = formatMoney(price);
+      document.getElementById("psFees").textContent = formatMoney(fees);
+      document.getElementById("psTaxRate").textContent = taxRate.toFixed(3) + "%";
+
+      // payments (just copy the on-screen text, which already has $ and /mo)
+      document.getElementById("psFinancePayment").textContent =
+        document.getElementById("financePayment").textContent;
+      document.getElementById("psLeasePayment").textContent =
+        document.getElementById("leasePayment").textContent;
+
+      window.print();
+    }
+
+    // set today date & first calc on load
+    document.getElementById("date").value = new Date().toLocaleDateString();
+    calculate();
+  </script>
+</body>
+</html>
